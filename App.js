@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Heading,
   useColorMode,
@@ -10,62 +10,52 @@ import {
   NativeBaseProvider,
   extendTheme,
 } from 'native-base';
+import {NavigationContainer} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {aceessToken} from './src/components/services/Action/Todo';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from './src/components/pages/Login';
-import {backgroundColor} from 'styled-system';
+import AsyncStorage from '@react-native-community/async-storage';
+import Signup from './src/components/pages/Signup';
+import MyDrawer from './src/components/pages/MyDrawer';
 
-function ColorModeExample() {
-  const {colorMode, toggleColorMode} = useColorMode();
-  return (
-    <>
-      <Heading>I'm a Heading</Heading>
-      <Button
-        colorScheme={colorMode === 'light' ? 'blue' : 'red'}
-        onPress={() => {
-          toggleColorMode();
-        }}>
-        Change mode
-      </Button>
-      <HStack space={2} mt={3}>
-        <Avatar
-          name="Ankur"
-          borderWidth={2}
-          source={{
-            uri: 'https://pbs.twimg.com/profile_images/1309797238651060226/18cm6VhQ_400x400.jpg',
-          }}
-        />
-        <Avatar
-          name="Rohit"
-          borderWidth={2}
-          source={{
-            uri: 'https://pbs.twimg.com/profile_images/1352844693151731713/HKO7cnlW_400x400.jpg',
-          }}
-        />
-      </HStack>
-    </>
-  );
-}
-const config = {
-  useSystemColorMode: false,
-  initialColorMode: 'white',
-};
-
-// extend the theme
-const customTheme = extendTheme({config});
-const LocalWrapper = ({children}) => {
-  const bg = useColorModeValue('gray.200', 'gray.800');
-  return (
-    <Center flex={1} bg={bg}>
-      {children}
-    </Center>
-  );
-};
-
+const Stack = createNativeStackNavigator();
 export default function App() {
+  const dispatch = useDispatch();
+  useEffect(async () => {
+    // SplashScreen.hide();
+    const data = await AsyncStorage.getItem('AceessToken');
+    dispatch(aceessToken(data));
+  }, []);
+  const token = useSelector(state => state.TodoReducer.token);
   return (
-    <NativeBaseProvider theme={extendTheme({initialColorMode: 'blue'})}>
-      <LocalWrapper>
-        <Login />
-      </LocalWrapper>
-    </NativeBaseProvider>
+    <NavigationContainer>
+      <NativeBaseProvider>
+        <Stack.Navigator>
+          {token === null ? (
+            <>
+              <Stack.Screen
+                options={{headerShown: false}}
+                name="Login"
+                component={Login}
+              />
+              <Stack.Screen
+                options={{headerShown: false}}
+                name="Signup"
+                component={Signup}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                options={{headerShown: false}}
+                name="Home page"
+                component={MyDrawer}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </NativeBaseProvider>
+    </NavigationContainer>
   );
 }
