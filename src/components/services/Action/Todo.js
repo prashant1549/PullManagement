@@ -5,7 +5,7 @@ import {
   ASYN_DATA,
   ITEM_QUNATITY,
   LIST_POLL,
-  CHECK_ITEM,
+  ITEM_ID,
   ORDER_PLACE,
 } from './Type';
 
@@ -34,9 +34,9 @@ export const addListPoll = data => ({
   type: LIST_POLL,
   data: data,
 });
-export const checkITEM = cart => ({
-  type: CHECK_ITEM,
-  data: cart,
+export const itemId = item => ({
+  type: ITEM_ID,
+  item: item,
 });
 export const orderPlace = cart => ({
   type: ORDER_PLACE,

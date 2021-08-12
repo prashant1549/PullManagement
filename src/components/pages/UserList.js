@@ -3,7 +3,15 @@ import {useDispatch, useSelector} from 'react-redux';
 import {asyncData} from '../services/Action/Todo';
 import axios from 'axios';
 import {paginate} from './Paginate';
-import {Text, FlatList, HStack, Heading, VStack, Button} from 'native-base';
+import {
+  Text,
+  FlatList,
+  HStack,
+  Heading,
+  VStack,
+  Button,
+  Box,
+} from 'native-base';
 const UserList = ({navigation}) => {
   const dispatch = useDispatch();
   const [currentPage, setcurrentPage] = useState(0);
@@ -20,31 +28,55 @@ const UserList = ({navigation}) => {
   let data1 = paginate(data, currentPage, 20);
   console.log(data1);
   return (
-    <VStack>
-      <HStack backgroundColor="#000">
-        <Heading flex={0.5} size={'md'} textAlign="center" color="#fff">
+    <VStack flex={1}>
+      <HStack flex={0.1} backgroundColor="#000">
+        <Heading
+          alignSelf="center"
+          flex={0.3}
+          size={'md'}
+          textAlign="center"
+          color="#fff">
+          User Id
+        </Heading>
+        <Heading
+          alignSelf="center"
+          flex={0.4}
+          size={'md'}
+          textAlign="center"
+          color="#fff">
           Username
         </Heading>
-        <Heading flex={0.5} size={'md'} textAlign="center" color="#fff">
+        <Heading
+          alignSelf="center"
+          flex={0.3}
+          size={'md'}
+          textAlign="center"
+          color="#fff">
           Role
         </Heading>
       </HStack>
       <FlatList
+        flex={0.9}
         data={data1}
         VirtualizedList={10}
         renderItem={({item}) => (
-          <HStack w="100%" border={1}>
-            <Text flex={0.5} ml={5}>
-              {item.username}
-            </Text>
-            <Text flex={0.5} textAlign="center">
-              {item.role}
-            </Text>
+          <HStack w="100%">
+            <Box border={1} flex={0.3}>
+              <Text numberOfLines={1}>{item._id}</Text>
+            </Box>
+            <Box border={1} flex={0.4}>
+              <Text numberOfLines={1} ml={1}>
+                {item.username}
+              </Text>
+            </Box>
+            <Box border={1} flex={0.3} textAlign="center">
+              <Text numberOfLines={1}>{item.role}</Text>
+            </Box>
           </HStack>
         )}
         keyExtractor={item => item._id}
       />
-      <HStack justifyContent="space-between" margin={5}>
+      <HStack flex={0.1} justifyContent="space-between" margin={5}>
         <Button
           disabled={currentPage > 1 ? false : true}
           colorScheme="cyan"

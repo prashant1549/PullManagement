@@ -5,7 +5,7 @@ import {
   ASYN_DATA,
   LIST_POLL,
   ITEM_QUNATITY,
-  CHECK_ITEM,
+  ITEM_ID,
   ORDER_PLACE,
 } from '../Action/Type';
 
@@ -14,6 +14,7 @@ const initialState = {
   token: null,
   listOfPoll: [],
   itemPlace: [],
+  pollDetails: null,
 };
 
 const TodoReducer = (state = initialState, action) => {
@@ -49,10 +50,10 @@ const TodoReducer = (state = initialState, action) => {
         ...state,
         cart: action.data,
       };
-    case CHECK_ITEM:
-      state.cart = action.data;
+    case ITEM_ID:
       return {
         ...state,
+        pollDetails: action.item,
       };
     case ORDER_PLACE:
       return {

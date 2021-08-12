@@ -33,13 +33,17 @@ export default function Login({navigation}) {
     } else {
       try {
         const token = await axios.post(
-          'https://secure-refuge-14993.herokuapp.com/login?',
-          {username: username, password: password},
+          `https://secure-refuge-14993.herokuapp.com/login?username=${username}&password=${password}`,
         );
-        dispatch(aceessToken(token.data.token));
-        await AsyncStorage.setItem('AceessToken', token.data.token);
-        setUsername('');
-        setPassword('');
+        if (token.data.error === 1) {
+          setError(token.data.data);
+        } else {
+          dispatch(aceessToken(token.data.token));
+          await AsyncStorage.setItem('AceessToken', token.data.token);
+          setUsername('');
+          setPassword('');
+          setError('');
+        }
       } catch (error) {
         setError(error);
       }
@@ -54,7 +58,9 @@ export default function Login({navigation}) {
         <Heading color="muted.400" size="xs">
           Sign in to continue!
         </Heading>
-
+        <Text alignSelf="center" color="red.500">
+          {error}
+        </Text>
         <VStack space={2} mt={5}>
           <FormControl>
             <Input

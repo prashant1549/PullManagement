@@ -18,6 +18,7 @@ import Login from './src/components/pages/Login';
 import AsyncStorage from '@react-native-community/async-storage';
 import Signup from './src/components/pages/Signup';
 import MyDrawer from './src/components/pages/MyDrawer';
+import DetailsAPull from './src/components/pages/DetailsAPull';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -52,6 +53,7 @@ export default function App() {
                 name="Home page"
                 component={MyDrawer}
               />
+              <Stack.Screen name="Details Of A Pull" component={DetailsAPull} />
             </>
           )}
         </Stack.Navigator>
