@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useEffect} from 'react';
 
 import {
   createDrawerNavigator,
@@ -6,6 +6,8 @@ import {
 } from '@react-navigation/drawer';
 import UserList from './UserList';
 import PullList from './PullList';
+import {useDispatch} from 'react-redux';
+import {addListPoll, asyncData} from '../services/Action/Todo';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   NativeBaseProvider,
@@ -87,7 +89,15 @@ function CustomDrawerContent(props) {
     </DrawerContentScrollView>
   );
 }
-export default function MyDrawer() {
+export default function MyDrawer({navigation}) {
+  const dispatch = useDispatch();
+  useEffect(async () => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      dispatch(addListPoll());
+      dispatch(asyncData());
+    });
+    return unsubscribe;
+  }, [navigation]);
   return (
     <NativeBaseProvider>
       <Box safeArea flex={1}>

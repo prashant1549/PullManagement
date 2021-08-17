@@ -18,12 +18,7 @@ import {toUpper} from 'lodash';
 const PullList = ({navigation}) => {
   const dispatch = useDispatch();
   const [currentPage, setcurrentPage] = useState(0);
-  useEffect(async () => {
-    const data = await axios.get(
-      'https://secure-refuge-14993.herokuapp.com/list_polls',
-    );
-    dispatch(addListPoll(data.data.data));
-  }, [navigation]);
+
   const data = useSelector(state => state.TodoReducer.listOfPoll);
   const handleCurrentPage = value => {
     setcurrentPage(currentPage => currentPage + value);

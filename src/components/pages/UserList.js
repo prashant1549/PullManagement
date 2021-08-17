@@ -15,12 +15,12 @@ import {
 const UserList = ({navigation}) => {
   const dispatch = useDispatch();
   const [currentPage, setcurrentPage] = useState(0);
-  useEffect(async () => {
-    const data = await axios.get(
-      'https://secure-refuge-14993.herokuapp.com/list_users',
-    );
-    dispatch(asyncData(data.data.data));
-  }, [navigation]);
+  // useEffect(async () => {
+  //   const data = await axios.get(
+  //     'https://secure-refuge-14993.herokuapp.com/list_users',
+  //   );
+  //   dispatch(asyncData(data.data.data));
+  // }, [navigation]);
   const data = useSelector(state => state.TodoReducer.cart);
   const handleCurrentPage = value => {
     setcurrentPage(currentPage => currentPage + value);
