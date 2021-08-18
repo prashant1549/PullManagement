@@ -1,18 +1,8 @@
 import React, {useEffect} from 'react';
-import {
-  Heading,
-  useColorMode,
-  Button,
-  HStack,
-  Avatar,
-  Center,
-  useColorModeValue,
-  NativeBaseProvider,
-  extendTheme,
-} from 'native-base';
+import {NativeBaseProvider} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {aceessToken} from './src/components/services/Action/Todo';
+import {accessToken} from './src/components/services/Action/ActionPoll';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from './src/components/pages/Login';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -26,9 +16,9 @@ export default function App() {
   useEffect(async () => {
     // SplashScreen.hide();
     const data = await AsyncStorage.getItem('AceessToken');
-    dispatch(aceessToken(data));
+    dispatch(accessToken(data));
   }, []);
-  const token = useSelector(state => state.TodoReducer.token);
+  const token = useSelector(state => state.user.token);
   return (
     <NavigationContainer>
       <NativeBaseProvider>

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {addListPoll, itemId} from '../services/Action/Todo';
-import axios from 'axios';
+import {showPollRequest} from '../services/Action/ActionPoll';
 import {paginate} from './Paginate';
-import {TouchableOpacity, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   FlatList,
@@ -19,15 +19,20 @@ const PullList = ({navigation}) => {
   const dispatch = useDispatch();
   const [currentPage, setcurrentPage] = useState(0);
 
-  const data = useSelector(state => state.TodoReducer.listOfPoll);
+  const poll = useSelector(state => state.poll);
+  useEffect(() => {
+    dispatch(showPollRequest());
+  }, [dispatch]);
+  // console.log(data);
   const handleCurrentPage = value => {
     setcurrentPage(currentPage => currentPage + value);
   };
-  const handleItemId = item => {
-    dispatch(itemId(item));
-    navigation.navigate('Details Of A Pull', {id: item._id});
+  const handleItemId = async id => {
+    await AsyncStorage.setItem('itemId', id);
+
+    navigation.navigate('Details Of A Pull');
   };
-  let data1 = paginate(data, currentPage, 5);
+  let data1 = paginate(poll.data.data, currentPage, 5);
   return (
     <VStack flex={1} backgroundColor="#fff">
       <FlatList
@@ -53,7 +58,7 @@ const PullList = ({navigation}) => {
               keyExtractor={(item, index) => index}
             />
             <Button
-              onPress={() => handleItemId(item)}
+              onPress={() => handleItemId(item._id)}
               m={3}
               colorScheme="cyan"
               _text={{color: 'white'}}>
@@ -73,7 +78,13 @@ const PullList = ({navigation}) => {
         </Button>
 
         <Button
-          disabled={Math.ceil(data.length / 5) > currentPage ? false : true}
+          disabled={
+            poll.data.data
+              ? Math.ceil(poll.data.data.length / 5) > currentPage
+                ? false
+                : true
+              : ''
+          }
           colorScheme="cyan"
           _text={{color: 'white'}}
           onPress={() => handleCurrentPage(+1)}>

@@ -8,111 +8,73 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {useSelector} from 'react-redux';
-import axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  reqPollById,
+  editTitleReq,
+  addVoteReq,
+  deleteOptionReq,
+  addOptionReq,
+  deletePollReq,
+} from '../services/Action/ActionPoll';
 import {FormControl, HStack, Input} from 'native-base';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-community/async-storage';
 const DetailsAPull = ({navigation}) => {
+  const dispatch = useDispatch();
   const [editButton, setEditButton] = useState(false);
   const [data, setData] = useState({});
   const [editTitle, setTitle] = useState('');
   const [addOption, setOption] = useState('');
-  const [count, setCount] = useState(-1);
   const [count1, setCount1] = useState(-1);
   const [modalVisible, setModalVisible] = useState(false);
-  const Data = useSelector(state => state.TodoReducer.pollDetails);
-  const tokenStr = useSelector(state => state.TodoReducer.token);
+
+  const Data = useSelector(state => state.singlePoll);
+  useEffect(async () => {
+    const id = await AsyncStorage.getItem('itemId');
+    dispatch(reqPollById(id));
+  }, []);
   const handleEdit = async value => {
     if (value === true) {
-      setTitle(Data.title);
+      setTitle(Data.singlePoll.data.title);
       setEditButton(value);
     } else {
-      try {
-        const edittitle = await axios.post(
-          `https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${Data._id}&title=${editTitle}`,
-          {},
-          {headers: {access_token: tokenStr}},
-        );
-        const token = await axios.get(
-          `https://secure-refuge-14993.herokuapp.com/list_poll?id=${Data._id}`,
-        );
-        setData(token.data.data);
-        setTitle('');
-        setEditButton(value);
-        setCount(1);
-      } catch (error) {}
+      const id = await AsyncStorage.getItem('itemId');
+      const data = {id, editTitle};
+      dispatch(editTitleReq(data));
+      setTitle('');
+      setEditButton(value);
     }
   };
   const hanldeVote = async option => {
-    setCount(1);
-    console.log(option);
-    try {
-      const edittitle = await axios.post(
-        `https://secure-refuge-14993.herokuapp.com/do_vote?id=${Data._id}&option_text=${option}`,
-        {},
-        {headers: {access_token: tokenStr}},
-      );
-      const token = await axios.get(
-        `https://secure-refuge-14993.herokuapp.com/list_poll?id=${Data._id}`,
-      );
-      setData(token.data.data);
-    } catch (error) {
-      //   setError(error);
-    }
+    const id = Data.singlePoll.data._id;
+    dispatch(addVoteReq({id, option}));
   };
   const handleDeletePollOption = async option => {
-    try {
-      const edittitle = await axios.post(
-        `https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${Data._id}&option_text=${option}`,
-        {},
-        {headers: {access_token: tokenStr}},
-      );
-      const token = await axios.get(
-        `https://secure-refuge-14993.herokuapp.com/list_poll?id=${Data._id}`,
-      );
-      setData(token.data.data);
-      setCount(1);
-    } catch (error) {
-      //   setError(error);
-    }
+    dispatch(
+      deleteOptionReq({
+        id: Data.singlePoll.data._id,
+        text: option,
+      }),
+    );
   };
   const handleAddOption = async option => {
-    try {
-      const edittitle = await axios.post(
-        `https://secure-refuge-14993.herokuapp.com/add_new_option?id=${Data._id}&option_text=${addOption}`,
-        {},
-        {headers: {access_token: tokenStr}},
-      );
-      const token = await axios.get(
-        `https://secure-refuge-14993.herokuapp.com/list_poll?id=${Data._id}`,
-      );
-      setData(token.data.data);
-      setCount(1);
-      setOption('');
-      setModalVisible(!modalVisible);
-    } catch (error) {
-      //   setError(error);
-    }
+    const id = await AsyncStorage.getItem('itemId');
+    const data = {id, addOption};
+    dispatch(addOptionReq(data));
+    setOption('');
+    setModalVisible(!modalVisible);
   };
   const handleDeleteCount = async () => {
     setCount1(3);
     setModalVisible(!modalVisible);
   };
   const handleDeletePoll = async () => {
-    console.log('amsnkajn');
-    try {
-      const edittitle = await axios.post(
-        ` https://secure-refuge-14993.herokuapp.com/delete_poll?id=${Data._id}`,
-        {},
-        {headers: {access_token: tokenStr}},
-      );
-      console.log(editTitle.data);
-      setCount1(-1);
-      setModalVisible(!modalVisible);
-      navigation.navigate('Polls List');
-    } catch (error) {
-      //   setError(error);
-    }
+    const id = await AsyncStorage.getItem('itemId');
+    dispatch(deletePollReq(id));
+    setCount1(-1);
+    setModalVisible(!modalVisible);
+    navigation.navigate('Polls List');
   };
   return (
     <>
@@ -130,7 +92,7 @@ const DetailsAPull = ({navigation}) => {
           <View style={{flex: 0.5, alignSelf: 'center'}}>
             {editButton === false ? (
               <Text style={{fontSize: 20, marginHorizontal: 10}}>
-                {count > 0 ? data.title : Data.title}
+                {Data.singlePoll.data ? Data.singlePoll.data.title : ''}
               </Text>
             ) : (
               <FormControl>
@@ -162,14 +124,18 @@ const DetailsAPull = ({navigation}) => {
                   textAlign: 'center',
                   fontSize: 20,
                 }}>
-                {editButton === false ? 'Edit' : 'Update'}
+                {editButton === false ? (
+                  <Icon name="edit" size={30} color="blue" />
+                ) : (
+                  <Icon name="update" size={30} color="blue" />
+                )}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
         <FlatList
           style={{flex: 0.8}}
-          data={count > 0 ? data.options : Data.options}
+          data={Data.singlePoll.data ? Data.singlePoll.data.options : ''}
           keyExtractor={(item, index) => index}
           renderItem={({item, index}) => (
             <View
@@ -244,7 +210,7 @@ const DetailsAPull = ({navigation}) => {
                   textAlign: 'center',
                   fontSize: 15,
                 }}>
-                Delete Poll
+                <Icon name="delete" size={30} color="red" />
               </Text>
             </TouchableOpacity>
           </View>
@@ -267,7 +233,7 @@ const DetailsAPull = ({navigation}) => {
                   textAlign: 'center',
                   fontSize: 15,
                 }}>
-                Add Option
+                <Icon name="library-add" size={30} color="blue" />
               </Text>
             </TouchableOpacity>
           </View>
