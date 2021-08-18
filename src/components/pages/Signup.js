@@ -33,14 +33,18 @@ export default function Signup({navigation}) {
     } else {
       try {
         const token = await axios.post(
-          'https://secure-refuge-14993.herokuapp.com/add_user?',
-          {username: username, password: password, role: role},
+          `https://secure-refuge-14993.herokuapp.com/add_user?username=${username}&password=${password}&role=${role}`,
         );
-        dispatch(aceessToken(token.data.token));
-        await AsyncStorage.setItem('AceessToken', token.data.token);
-        setUsername('');
-        setPassword('');
-        setRole('');
+        console.log(token.data);
+        if (token.data.error === 1) {
+          setError(token.data.message);
+        } else {
+          setUsername('');
+          setPassword('');
+          setRole('');
+          setError('');
+          navigation.navigate('Login');
+        }
       } catch (error) {
         setError(error);
       }
@@ -55,7 +59,9 @@ export default function Signup({navigation}) {
         <Heading color="muted.400" size="xs">
           Sign up to continue!
         </Heading>
-
+        <Text alignSelf="center" color="red.500">
+          {error}
+        </Text>
         <VStack space={2} mt={5}>
           <FormControl>
             <Input
@@ -67,6 +73,7 @@ export default function Signup({navigation}) {
           <FormControl>
             <Input
               placeholder="Enter password"
+              type="password"
               onChangeText={e => setPassword(e)}
               value={password}
             />
@@ -79,7 +86,10 @@ export default function Signup({navigation}) {
             />
           </FormControl>
           <VStack space={2} mt={5}>
-            <Button colorScheme="cyan" _text={{color: 'white'}}>
+            <Button
+              onPress={() => handleSubmit()}
+              colorScheme="cyan"
+              _text={{color: 'white'}}>
               SignUp
             </Button>
 
