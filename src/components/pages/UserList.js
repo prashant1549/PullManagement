@@ -1,6 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {asyncData} from '../services/Action/Todo';
 import axios from 'axios';
 import {paginate} from './Paginate';
 import {
@@ -13,20 +11,22 @@ import {
   Box,
 } from 'native-base';
 const UserList = ({navigation}) => {
-  const dispatch = useDispatch();
+  const [users, setUsers] = useState([]);
   const [currentPage, setcurrentPage] = useState(0);
-  // useEffect(async () => {
-  //   const data = await axios.get(
-  //     'https://secure-refuge-14993.herokuapp.com/list_users',
-  //   );
-  //   dispatch(asyncData(data.data.data));
-  // }, [navigation]);
-  const data = useSelector(state => state.TodoReducer.cart);
+  useEffect(async () => {
+    await axios
+      .get('https://secure-refuge-14993.herokuapp.com/list_users')
+      .then(res => {
+        setUsers(res.data);
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }, []);
   const handleCurrentPage = value => {
     setcurrentPage(currentPage => currentPage + value);
   };
-  let data1 = paginate(data, currentPage, 20);
-  console.log(data1);
+  let data1 = paginate(users.data, currentPage, 20);
   return (
     <VStack flex={1}>
       <HStack flex={0.1} backgroundColor="#000">
@@ -86,7 +86,13 @@ const UserList = ({navigation}) => {
         </Button>
 
         <Button
-          disabled={Math.ceil(data.length / 20) > currentPage ? false : true}
+          disabled={
+            users.data
+              ? Math.ceil(users.data.length / 20) > currentPage
+                ? false
+                : true
+              : ''
+          }
           colorScheme="cyan"
           _text={{color: 'white'}}
           onPress={() => handleCurrentPage(+1)}>

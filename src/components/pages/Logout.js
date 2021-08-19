@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import {useDispatch} from 'react-redux';
-import {aceessToken} from '../services/Action/Todo';
+import {accessToken, loginSuccess} from '../services/Action/ActionPoll';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const Logout = ({navigation}) => {
@@ -9,7 +9,7 @@ const Logout = ({navigation}) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       await AsyncStorage.removeItem('AceessToken');
-      dispatch(aceessToken(null));
+      dispatch(accessToken(null));
       navigation.navigate('Login');
     });
 

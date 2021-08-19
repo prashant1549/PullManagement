@@ -10,7 +10,10 @@ import {
   FormControl,
 } from 'native-base';
 import axios from 'axios';
+import {useDispatch} from 'react-redux';
+import {createPollRequest} from '../services/Action/ActionPoll';
 const AddPull = ({navigation}) => {
+  const dispatch = useDispatch();
   const [title, setTitle] = useState('');
   const [option1, setOption1] = useState('');
   const [option2, setOption2] = useState('');
@@ -28,21 +31,22 @@ const AddPull = ({navigation}) => {
     ) {
       setError('Please fill are required filled');
     } else {
-      try {
-        const token = await axios.post(
-          `https://secure-refuge-14993.herokuapp.com/add_poll?title=${title}&options=${option1}____${option2}____${option3}____${option4}`,
-        );
+      const options = {
+        opt1: option1,
+        opt2: option2,
+        opt3: option3,
+        opt4: option4,
+      };
+      const data = {title, options};
+      dispatch(createPollRequest(data));
 
-        setTitle('');
-        setOption1('');
-        setOption2('');
-        setOption3('');
-        setOption4('');
-        setError('');
-        navigation.navigate('Polls List');
-      } catch (error) {
-        setError(error);
-      }
+      setTitle('');
+      setOption1('');
+      setOption2('');
+      setOption3('');
+      setOption4('');
+      setError('');
+      navigation.navigate('Polls List');
     }
   };
   return (

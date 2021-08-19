@@ -17,7 +17,8 @@ import {
 } from 'native-base';
 import axios from 'axios';
 import {useDispatch} from 'react-redux';
-import {aceessToken} from '../services/Action/Todo';
+import {signupRequest} from '../services/Action/ActionPoll';
+import {aceessToken} from '../services/Action/ActionPoll';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Signup({navigation}) {
@@ -28,26 +29,12 @@ export default function Signup({navigation}) {
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
-    if (username == '' || password == '') {
+    const data = {username, password, role};
+    if (username == '' || password == '' || role == '') {
       setError('Please enter username and password');
     } else {
-      try {
-        const token = await axios.post(
-          `https://secure-refuge-14993.herokuapp.com/add_user?username=${username}&password=${password}&role=${role}`,
-        );
-        console.log(token.data);
-        if (token.data.error === 1) {
-          setError(token.data.message);
-        } else {
-          setUsername('');
-          setPassword('');
-          setRole('');
-          setError('');
-          navigation.navigate('Login');
-        }
-      } catch (error) {
-        setError(error);
-      }
+      dispatch(signupRequest(data));
+      navigation.navigate('Login');
     }
   };
   return (

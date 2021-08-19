@@ -1,31 +1,40 @@
 import {call, put, takeEvery, takeLatest} from 'redux-saga/effects';
 import {ASYN_DATA, LIST_POLL} from './Action/Type';
-// import {asyncData, addListPoll} from './actions';
-import {asyncData, addListPoll} from './Action/Todo';
+import {asyncData, addListPoll} from './Action/ActionPoll';
+import axios from 'axios';
 
-async function* fetchUser() {
+async function requestAllUsers() {
+  const response = await axios.get(
+    'https://secure-refuge-14993.herokuapp.com/list_users',
+  );
+  return response;
+}
+function* fetchUserList() {
   try {
-    const data = await axios.get(
-      'https://secure-refuge-14993.herokuapp.com/list_users',
-    );
-
+    const data = yield call(requestAllUsers);
     yield put(asyncData(data.data.data));
   } catch (e) {}
 }
-async function* fetchPollList() {
+
+async function requestAllPoll() {
+  const response = await axios.get(
+    'https://secure-refuge-14993.herokuapp.com/list_polls',
+  );
+  return response;
+}
+
+function* fetchPollList() {
   try {
-    const data = await axios.get(
-      'https://secure-refuge-14993.herokuapp.com/list_polls',
-    );
-
+    const data = yield call(requestAllPoll);
     yield put(addListPoll(data.data.data));
-  } catch (e) {}
+  } catch (error) {
+    console.log('niketan', error);
+  }
 }
 
-function* Sagas() {
-  yield takeLatest(ASYN_DATA, fetchUser);
+function* Saga() {
+  yield takeLatest(ASYN_DATA, fetchUserList);
   yield takeLatest(LIST_POLL, fetchPollList);
-  // yield takeLatest(FETCH_SMURF_DATA, onFetchSmurfData);
 }
 
-export default Sagas;
+export default Saga;

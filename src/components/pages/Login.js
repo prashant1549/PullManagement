@@ -10,16 +10,10 @@ import {
   Input,
   Link,
   Button,
-  Icon,
-  IconButton,
   HStack,
-  Divider,
-  Center,
 } from 'native-base';
-import axios from 'axios';
+import {loginRequest} from '../services/Action/ActionPoll';
 import {useDispatch} from 'react-redux';
-import {aceessToken} from '../services/Action/Todo';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Login({navigation}) {
   const dispatch = useDispatch();
@@ -28,25 +22,11 @@ export default function Login({navigation}) {
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
+    const data = {username, password};
     if (username == '' || password == '') {
       setError('Please enter username and password');
     } else {
-      try {
-        const token = await axios.post(
-          `https://secure-refuge-14993.herokuapp.com/login?username=${username}&password=${password}`,
-        );
-        if (token.data.error === 1) {
-          setError(token.data.data);
-        } else {
-          dispatch(aceessToken(token.data.token));
-          await AsyncStorage.setItem('AceessToken', token.data.token);
-          setUsername('');
-          setPassword('');
-          setError('');
-        }
-      } catch (error) {
-        setError(error);
-      }
+      await dispatch(loginRequest(data));
     }
   };
   return (
