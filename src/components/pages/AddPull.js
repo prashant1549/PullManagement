@@ -8,12 +8,14 @@ import {
   Heading,
   Text,
   FormControl,
+  useToast,
 } from 'native-base';
 import axios from 'axios';
 import {useDispatch} from 'react-redux';
 import {createPollRequest} from '../services/Action/ActionPoll';
 const AddPull = ({navigation}) => {
   const dispatch = useDispatch();
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [option1, setOption1] = useState('');
   const [option2, setOption2] = useState('');
@@ -29,7 +31,10 @@ const AddPull = ({navigation}) => {
       option3 == '' ||
       option4 == ''
     ) {
-      setError('Please fill are required filled');
+      toast.show({
+        status: 'error',
+        description: 'Please fill are required filled',
+      });
     } else {
       const options = {
         opt1: option1,
@@ -39,7 +44,10 @@ const AddPull = ({navigation}) => {
       };
       const data = {title, options};
       dispatch(createPollRequest(data));
-
+      toast.show({
+        status: 'success',
+        description: 'Successfully Create Poll',
+      });
       setTitle('');
       setOption1('');
       setOption2('');

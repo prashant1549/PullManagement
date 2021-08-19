@@ -13,6 +13,8 @@ import {
   Button,
   Box,
   VStack,
+  Spinner,
+  Center,
 } from 'native-base';
 import {toUpper} from 'lodash';
 const PullList = ({navigation}) => {
@@ -29,69 +31,82 @@ const PullList = ({navigation}) => {
   };
   const handleItemId = async id => {
     await AsyncStorage.setItem('itemId', id);
-
     navigation.navigate('Details Of A Pull');
   };
   let data1 = paginate(poll.data.data, currentPage, 5);
   return (
-    <VStack flex={1} backgroundColor="#fff">
-      <FlatList
-        flex={0.9}
-        data={data1}
-        renderItem={({item}) => (
-          <Box style={styles.subcat} backgroundColor="gray.700">
-            <Heading size="md" color="#fff" alignSelf="center">
-              {toUpper(item.title)}
-            </Heading>
-            <Divider my={2} />
+    <>
+      {!poll.data.data ? (
+        <VStack
+          flex={1}
+          justifyContent="center"
+          alignItems="center"
+          backgroundColor="#fff">
+          <HStack space={2}>
+            <Spinner accessibilityLabel="Loading posts" />
+          </HStack>
+        </VStack>
+      ) : (
+        <VStack flex={1} backgroundColor="#fff">
+          <FlatList
+            flex={0.9}
+            data={data1}
+            renderItem={({item}) => (
+              <Box style={styles.subcat} backgroundColor="gray.700">
+                <Heading size="md" color="#fff" alignSelf="center">
+                  {toUpper(item.title)}
+                </Heading>
+                <Divider my={2} />
 
-            <FlatList
-              ml={4}
-              data={item.options}
-              renderItem={({item, index}) => (
-                <View>
-                  <Text color="#fff">
-                    {index + 1}. {item.option}
-                  </Text>
-                </View>
-              )}
-              keyExtractor={(item, index) => index}
-            />
+                <FlatList
+                  ml={4}
+                  data={item.options}
+                  renderItem={({item, index}) => (
+                    <View>
+                      <Text color="#fff">
+                        {index + 1}. {item.option}
+                      </Text>
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => index}
+                />
+                <Button
+                  onPress={() => handleItemId(item._id)}
+                  m={3}
+                  colorScheme="cyan"
+                  _text={{color: 'white'}}>
+                  View Details
+                </Button>
+              </Box>
+            )}
+            keyExtractor={item => item._id}
+          />
+          <HStack flex={0.1} justifyContent="space-between" margin={5}>
             <Button
-              onPress={() => handleItemId(item._id)}
-              m={3}
+              disabled={currentPage > 1 ? false : true}
               colorScheme="cyan"
-              _text={{color: 'white'}}>
-              View Details
+              _text={{color: 'white'}}
+              onPress={() => handleCurrentPage(-1)}>
+              Previous page
             </Button>
-          </Box>
-        )}
-        keyExtractor={item => item._id}
-      />
-      <HStack flex={0.1} justifyContent="space-between" margin={5}>
-        <Button
-          disabled={currentPage > 1 ? false : true}
-          colorScheme="cyan"
-          _text={{color: 'white'}}
-          onPress={() => handleCurrentPage(-1)}>
-          Previous page
-        </Button>
 
-        <Button
-          disabled={
-            poll.data.data
-              ? Math.ceil(poll.data.data.length / 5) > currentPage
-                ? false
-                : true
-              : ''
-          }
-          colorScheme="cyan"
-          _text={{color: 'white'}}
-          onPress={() => handleCurrentPage(+1)}>
-          Next Page
-        </Button>
-      </HStack>
-    </VStack>
+            <Button
+              disabled={
+                poll.data.data
+                  ? Math.ceil(poll.data.data.length / 5) > currentPage
+                    ? false
+                    : true
+                  : ''
+              }
+              colorScheme="cyan"
+              _text={{color: 'white'}}
+              onPress={() => handleCurrentPage(+1)}>
+              Next Page
+            </Button>
+          </HStack>
+        </VStack>
+      )}
+    </>
   );
 };
 
