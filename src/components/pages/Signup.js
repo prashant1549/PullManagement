@@ -11,30 +11,55 @@ import {
   Link,
   Button,
   Icon,
-  IconButton,
+  useToast,
   HStack,
   Divider,
 } from 'native-base';
 import axios from 'axios';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {signupRequest} from '../services/Action/ActionPoll';
 import {aceessToken} from '../services/Action/ActionPoll';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Signup({navigation}) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
 
+  const {
+    isError,
+    isSuccess,
+    userStatus = '',
+  } = useSelector(state => state.signupUser);
+
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      toast.show({
+        status: 'success',
+        description: 'Successfully user Register',
+      });
+      navigation.navigate('Login');
+    } else if (isError) {
+      toast.show({
+        status: 'error',
+        description: userStatus,
+      });
+      dispatch(dispatch({type: 'SIGNUP_DEFAULT'}));
+    }
+  }, [isError, isSuccess]);
+
   const handleSubmit = async () => {
     const data = {username, password, role};
     if (username == '' || password == '' || role == '') {
-      setError('Please enter username and password');
+      toast.show({
+        status: 'error',
+        description: 'Please enter all required filled',
+      });
     } else {
       dispatch(signupRequest(data));
-      navigation.navigate('Login');
     }
   };
   return (

@@ -11,20 +11,48 @@ import {
   Link,
   Button,
   HStack,
+  useToast,
 } from 'native-base';
 import {loginRequest} from '../services/Action/ActionPoll';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Login({navigation}) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const {
+    isError,
+    isSuccess,
+    userStatus = '',
+  } = useSelector(state => state.user);
+  useEffect(async () => {
+    const token = await AsyncStorage.getItem('AceessToken');
+    if (isError) {
+      toast.show({
+        status: 'error',
+        description: userStatus,
+      });
+      dispatch({type: 'LOGIN_DEFAULT'});
+    } else if (isSuccess === true && token) {
+      toast.show({
+        status: 'success',
+        description: 'Successfully Login',
+      });
+    }
+  }, [isError, isSuccess]);
+
   const handleSubmit = async () => {
     const data = {username, password};
     if (username == '' || password == '') {
-      setError('Please enter username and password');
+      toast.show({
+        status: 'error',
+        description: 'Please enter username and password',
+      });
+      // setError('Please enter username and password');
     } else {
       await dispatch(loginRequest(data));
     }
